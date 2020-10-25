@@ -13,8 +13,18 @@ public class readMatrix {
         if (args.length == 2) {
             String inputFile = args[0];
             String outputFile = args[1];
-
-
+            try {
+                graphInput(inputFile, outputFile);
+                System.out.println("The adjacent matrix was written to the " +
+                        " specified output file.");
+            } catch (FileNotFoundException e) {
+                System.out.println("There is an error:" + e.getMessage() + " .");
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("You must have (2) runtime arguments for the " +
+                    "program to run: the data.txt and the output.txt file.");
+            System.exit(1);
         }
     }
 
@@ -55,13 +65,21 @@ public class readMatrix {
                         }
                     }
             }
-            String paths = allThePaths(matrices);
+            String route = allThePaths(matrices);
 
             if(hasData) {
-               writeOutput(outputFile, matrices, paths, false);
-               hasData = false;
+                try {
+                    writeToOutputFile(outputFile, matrices, route, false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                hasData = false;
             } else {
-                writeOutput(outputFile, matrices, paths, true);
+                try {
+                    writeToOutputFile(outputFile, matrices, route, true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             inputGraphs.close();
         }
@@ -105,7 +123,7 @@ public class readMatrix {
                      }
 
                      StringBuffer route = new StringBuffer();
-                     wholePath(matrices, prev, wasChecked, i, j, k, 0, false, route);
+                     wholeRoute(matrices, prev, wasChecked, i, j, k, 0, false, route);
 
                      if (route.toString().equals("")){
                          route.append("no path found." + "\n");
@@ -127,14 +145,68 @@ public class readMatrix {
      *
      * @param outputFile the file that will be created from read data
      * @param matrices
-     * @param paths
+     * @param route
      * @param writeData
      */
-    static void writeOutput(String outputFile, LinkedList<Integer> matrices[], String paths, boolean writeData){
-
+    static void writeToOutputFile(String outputFile, LinkedList<Integer> matrices[], String route, boolean writeData) throws IOException {
+        FileWriter outputGraphs = new FileWriter(new File(outputFile), writeData);
+        for( int i = 0; i < matrices.length; i++) {
+            for(int j = 0; j < matrices.length; j++) {
+                if( matrices[i].contains(j)) {
+                    outputGraphs.write(" 1 ");
+                } else {
+                    outputGraphs.write(" 0 ");
+                }
+                outputGraphs.append("\n");
+            }
+        }
+        outputGraphs.close();
     }
 
-    static void wholePath(){
+    static void recursiveRoute(int[] prev, int startPoint, int x, StringBuffer allThePaths) {
+        if (x == startPoint){
+            return;
+        } else {
+            recursiveRoute(prev, startPoint,prev[x], allThePaths);
+            allThePaths.append(" > " + (x +1));
+        }
+    }
+
+    /**
+     * This block of code is responsible finding all of the paths available
+     * based on the input given from the original data file. It uses recursion
+     * since it depends on the method
+     * @param matrices
+     * @param prev
+     * @param wasChecked
+     * @param beginning
+     * @param end
+     * @param num1
+     * @param num2
+     * @param atEnd
+     * @param route
+     */
+    static void wholeRoute(LinkedList<Integer> matrices[], int[] prev, boolean[] wasChecked, int beginning, int end, int num1, int num2, boolean atEnd, StringBuffer route) {
+        if ((num1 >= matrices.length) || (num2 >= matrices.length)) {
+            return;
+        }
+
+        if (atEnd) {
+            route.append("\t" + (beginning +1));
+            recursiveRoute(prev, beginning, prev[end], route);
+            route.append(" > " + (end + 1) + "\n");
+            return;
+        }
+
+        if(matrices[num1].contains(num2) && (!wasChecked[num2])){
+            wasChecked[num2] = true;
+            prev[num2] = num1;
+
+            if(num2 == end){
+
+            }
+        }
+
 
     }
 

@@ -3,10 +3,7 @@ Course 605.203.81 Fall 2020
 
 ## Lab 2
 
-The purpose of this lab is to simulate an evaluation of an elevator maintai
--ned by 
-ABCCorporation. I developed and ran my project in Eclipse IDE, specifically in JDK 8. 
-In order to run the program (1) runtime arguments must be entered into the command 
+The purpose of this lab is to simulate... In order to run the program (2) runtime arguments must be entered into the command 
 line: the file path to the data.txt file, and the file path to the analysis.txt file.
 Without those two runtime arguments the program will not execute properly. The second
 file analysis.txt file will be empty until the program writes its output to the file.
