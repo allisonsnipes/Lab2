@@ -3,6 +3,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 public class readMatrix {
+
     /**
      * This is the main method of the program. The program will take (2) run-
      * time arguments. Without the proper arguments the program will not
@@ -36,7 +37,7 @@ public class readMatrix {
      *
      * @param inputFile the data file provided to read the matrices
      * @param outputFile the file that will be created from read data
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException needed for the error to be thrown
      */
     static void graphInput(String inputFile, String outputFile) throws FileNotFoundException {
         Scanner inputGraphs = new Scanner(new File(inputFile));
@@ -71,6 +72,7 @@ public class readMatrix {
                 try {
                     writeToOutputFile(outputFile, matrices, route, false);
                 } catch (IOException e) {
+                    System.out.println("There is an error:" + e.getMessage() + " .");
                     e.printStackTrace();
                 }
                 hasData = false;
@@ -78,6 +80,7 @@ public class readMatrix {
                 try {
                     writeToOutputFile(outputFile, matrices, route, true);
                 } catch (IOException e) {
+                    System.out.println("There is an error:" + e.getMessage() + " .");
                     e.printStackTrace();
                 }
             }
@@ -91,8 +94,8 @@ public class readMatrix {
      * as it will call another method that will search for a path between
      * vertices.
      *
-     * @param matrices
-     * @return
+     * @param matrices this is the matrix that hold all of the data points
+     * @return the paths as strings
      */
     static String allThePaths(LinkedList<Integer> matrices[]) {
          int num = matrices.length;
@@ -138,15 +141,14 @@ public class readMatrix {
     }
 
     /**
-     * This block of code is responsible for reading the given input file,
-     * output file, and throwing an exception should the file cannot be
-     * read. This block of code is also responsible for creating the
-     * Linklist that will hold the information contained in each graph/matrix.
+     * This block of code is responsible for writing to the output file,
+     * and throwing an exception should the file cannot be
+     * written. It is in charge of writing the adjacency matrix.
      *
      * @param outputFile the file that will be created from read data
-     * @param matrices
-     * @param route
-     * @param writeData
+     * @param matrices holds the data points of adjacency
+     * @param route is the path between each vertex
+     * @param writeData the boolean variable
      */
     static void writeToOutputFile(String outputFile, LinkedList<Integer> matrices[], String route, boolean writeData) throws IOException {
         FileWriter outputGraphs = new FileWriter(new File(outputFile), writeData);
@@ -163,28 +165,38 @@ public class readMatrix {
         outputGraphs.close();
     }
 
+    /**
+     * This is the method that will be called recursively to find the path
+     * between each vertex.
+     *
+     * @param prev the vertex prior to the vertex being check
+     * @param startPoint starting point in the row
+     * @param x vertex to check
+     * @param allThePaths the StringBuffer declared in a prior method
+     */
     static void recursiveRoute(int[] prev, int startPoint, int x, StringBuffer allThePaths) {
         if (x == startPoint){
             return;
         } else {
-            recursiveRoute(prev, startPoint,prev[x], allThePaths);
-            allThePaths.append(" > " + (x +1));
+            recursiveRoute(prev, startPoint, prev[x], allThePaths);
+            allThePaths.append(" > " + (x + 1));
         }
     }
 
     /**
      * This block of code is responsible finding all of the paths available
      * based on the input given from the original data file. It uses recursion
-     * since it depends on the method
-     * @param matrices
-     * @param prev
-     * @param wasChecked
-     * @param beginning
-     * @param end
-     * @param num1
-     * @param num2
-     * @param atEnd
-     * @param route
+     * since it depends on the method to execute properly.
+     *
+     * @param matrices holds the data points of adjacency
+     * @param prev the vertex prior to the vertex being check
+     * @param wasChecked boolean variable to specify if it was checked or not
+     * @param beginning beginning of the row
+     * @param end end of the row
+     * @param num1 vertex to compare
+     * @param num2 vertex to compare
+     * @param atEnd boolean varible to determine if it is at the end point of the row
+     * @param route is the path between each vertex
      */
     static void wholeRoute(LinkedList<Integer> matrices[], int[] prev, boolean[] wasChecked, int beginning, int end, int num1, int num2, boolean atEnd, StringBuffer route) {
         if ((num1 >= matrices.length) || (num2 >= matrices.length)) {
@@ -202,12 +214,17 @@ public class readMatrix {
             wasChecked[num2] = true;
             prev[num2] = num1;
 
-            if(num2 == end){
-
+            if(num2 == end) {
+                atEnd = true;
+            } else {
+                atEnd = false;
             }
+            wholeRoute(matrices, prev, wasChecked, beginning, end, num2, 0, atEnd, route);
+            wasChecked[num2] = false;
+            prev[num2] = -1;
+            atEnd = false;
         }
-
-
+        wholeRoute(matrices, prev, wasChecked, beginning, end, num1, num2 + 1, atEnd, route);
     }
 
 }
